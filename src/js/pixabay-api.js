@@ -1,4 +1,6 @@
+'use strict';
 
+import axios from "axios";
 
 export class PixabayApi {
     #BASE_URL = 'https://pixabay.com/api/';
@@ -10,21 +12,19 @@ export class PixabayApi {
     }
 
     fetchPhotos() {
-        const searchParams = new URLSearchParams({
-            key: this.#API_KEY,
-            q: this.searchQuery,
-            image_type: "photo",
-            orientation: "horizontal",
-            safesearch: "true",
-            page: this.page,
-            per_page: '40'
-        });
-        return fetch(`${this.#BASE_URL}?${searchParams}`).then(resolve => {
-            if (!resolve.ok) {
-                throw new Error(resolve.statusText);
+        const searchParams = {
+            params: {
+                key: this.#API_KEY,
+                q: this.searchQuery,
+                image_type: "photo",
+                orientation: "horizontal",
+                safesearch: "true",
+                page: this.page,
+                per_page: '40'
             }
+        }
 
-            return resolve.json();
-        });
+        return axios.get(`${this.#BASE_URL}`, searchParams);
+        
     }
 }
