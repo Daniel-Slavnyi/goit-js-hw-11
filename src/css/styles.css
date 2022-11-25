@@ -13,6 +13,8 @@ body {
   margin: 0;
   padding: 0;
   background: rgb(255, 255, 255);
+  padding-bottom: 30px;
+  text-align: center;
 }
 
 @keyframes gradient {
@@ -40,7 +42,20 @@ body {
   margin-bottom: 30px;
   background-color: yellow;
   box-shadow: 8px 11px 18px 0px rgb(0 0 255 / 45%);
-  
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+}
+
+.btn-submit {
+  border-radius: 10px;
+  border: 2px solid wheat;
+  background: transparent;
+  cursor: pointer;
+  display: block;
+  min-width: 100px;
+   height: 50px;
+   color: wheat;
 }
 
 .gradient {
@@ -66,7 +81,7 @@ body {
   border: 2px solid wheat;
   background: transparent;
   display: block;
-  margin: 0 auto;
+  
   outline: none;
   font-size: 20px;
   padding-left: 10px;
@@ -117,4 +132,7 @@ body {
   padding: 10px 0;
   margin-top: 30px;
   color: rgb(66, 63, 58);
+  background: wheat;
+  border-radius: 10px;
+  cursor: pointer;
 }

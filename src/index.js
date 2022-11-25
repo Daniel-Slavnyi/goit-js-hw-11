@@ -4,78 +4,84 @@ import createGalleryCard from './templates/photo-card.hbs';
 import Notiflix from 'notiflix';
 import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
-console.log('hihiuhihi');
+
 const refs = {
     searchFormEl: document.querySelector('.search-form'),
     galleryEl: document.querySelector('.gallery'),
     btnAddMoreEL: document.querySelector('.btn-more')
 };
 
+const simpleLightBox = new SimpleLightbox('.gallery a', {
+            captionsData: 'alt',
+            captionDelay: 250
+            });
+
 const pixabayApi = new PixabayApi();
 
-refs.searchFormEl.addEventListener('submit', onSearchFormSibmit);
-refs.btnAddMoreEL.addEventListener('click', onBtnAddMoreClick);
-
-function onSearchFormSibmit(e) {
+const onSearchFormSibmit = async (e) => {
     e.preventDefault();
 
     pixabayApi.searchQuery = e.target.elements.searchQuery.value;
     pixabayApi.page = 1;
 
-    
-    pixabayApi.fetchPhotos().then(photos => {
+    try {
+        const response = await pixabayApi.fetchPhotos();
 
-        console.log(photos);
-        const { data } = photos;
+        const { data } = response;
        
         if (data.totalHits === 0) {
             Notiflix.Notify.failure("We're sorry, but you've reached the end of search results.");
             return;
         }
         
-        if (data.totalHits / 40 <= pixabayApi.page) {
-            refs.galleryEl.innerHTML = createGalleryCard(data.hits);
-            Notiflix.Notify.success(`Hooray! We found ${data.totalHits} images.`);
-            
-            new SimpleLightbox('.gallery a', {
-            captionsData: 'alt',
-            captionDelay: 250
-            });
-            
-            return;
+        if (data.totalHits / pixabayApi.per_page > pixabayApi.page) {
+             refs.btnAddMoreEL.classList.remove('is-hidden');
         }
 
         Notiflix.Notify.success(`Hooray! We found ${data.totalHits} images.`);
         refs.galleryEl.innerHTML = createGalleryCard(data.hits);
+        simpleLightBox.refresh();
+
         
-            new SimpleLightbox('.gallery a', {
-            captionsData: 'alt',
-            captionDelay: 250
-            });
+    } catch (error) {
+        console.log(error);
+    }
+};
 
-        refs.btnAddMoreEL.classList.remove('is-hidden');
-
-    }).catch (err => {
-        console.log(err);  
-    });
-}
-
-function onBtnAddMoreClick() {
+const onBtnAddMoreClick = async () => {
     pixabayApi.page += 1;
 
-    pixabayApi.fetchPhotos().then(photos => {
-        const { data } = photos;
+    try {
+        const response = await pixabayApi.fetchPhotos();
+
+        const { data } = response;
+
         refs.galleryEl.insertAdjacentHTML('beforeend', createGalleryCard(data.hits));
 
-        new SimpleLightbox('.gallery a', {
-        captionsData: 'alt',
-        captionDelay: 250
-        });
+        simpleLightBox.refresh();
 
-        if (data.totalHits / 40 < pixabayApi.page) {
+        const { height: cardHeight } = document.querySelector(".gallery")
+            .firstElementChild.getBoundingClientRect();
+
+            window.scrollBy({
+            top: cardHeight * 2.5,
+            behavior: "smooth",
+});
+
+        if (data.totalHits / pixabayApi.per_page < pixabayApi.page) {
             refs.btnAddMoreEL.classList.add('is-hidden');
         }
-    });
-}
+
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+refs.searchFormEl.addEventListener('submit', onSearchFormSibmit);
+refs.btnAddMoreEL.addEventListener('click', onBtnAddMoreClick);
+
+
+
+
 
 
